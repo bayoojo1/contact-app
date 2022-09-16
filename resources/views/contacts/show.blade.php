@@ -7,10 +7,14 @@
     <title>Document</title>
 </head>
 <body>
-    <h1>Contact App</h1>
+    <h1>Contact Details</h1>
+    <div>
+        <p>Name: {{ $contact['name'] }}</p>
+        <p>Phone: {{ $contact['phone'] }}</p>
+    </div>
 
     <div>
-        <a href='{{ route('contacts.index') }}'>All Contacts</a>
+        <a href='{{ route('contacts.index') }}'>Back to all contacts</a>
     </div>
 
 </body>

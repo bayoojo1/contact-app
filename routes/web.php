@@ -13,41 +13,48 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+function getContacts() 
+{
+    return [
+        1 => ['name' => 'Ojo Adebayo', 'phone' => '+2348023950246'],
+        2 => ['name' => 'Abiodun Abodunde', 'phone' => '+2348033432378'],
+        3 => ['name' => 'Mfon Umoh', 'phone' => '+2348037047789'],
+    ];
+}
+
 
 Route::get('/', function () {
-   $html = "
-    <h1>Contact App</h1>
-
-    <div>
-        <a href='" . route('contacts.index') . "'>All Contacts</a>
-        <a href='" . route('contacts.create') . "'>Add Contact</a>
-        <a href='" . route('contacts.show', 1) . "'>Show Contact</a>
-        <a href='" . route('companies.show') . "'>Show Companies</a>
-    </div>
-   ";
-   return $html; 
+   return view('welcome'); 
 });
 
+Route::prefix('admin')->group(function () {
+    Route::get('/contacts', function () {
+        $contacts = getContacts();
+    return view('contacts.index', compact('contacts')); //Note: compact function creates an array from variables and their values. Instead of using compact function, we can also pass 'contacts' => $contacts as the second argument of the view.
+    })->name('contacts.index');
+    
+    Route::get('/contacts/create', function () {
+        return view('contacts.create');
+    })->name('contacts.create');
+    
+    Route::get('/contacts/{id}', function ($id) {
+        $contacts = getContacts();
+        
+        abort_if(!isset($contacts[$id]), 404); //If you try to access an id that does not exit, this laravel function would redirect to a 404 page
 
-Route::get('/contacts', function () {
-    return "<h1>All Contacts</h1>";
-})->name('contacts.index');
+        $contact = $contacts[$id];
+        return view('contacts.show')->with('contact', $contact);
+    })->where('id', '[0-9]+')->name('contacts.show'); //Note: You can also replace the where constraint above with whereNumber('id') without having to use the regular expression as used above
+    
+    Route::get('/companies/{name?}', function ($name = null) {
+        if ($name) {
+            return "Company " . $name;
+        } else {
+            return "All companies";
+        }
+    })->where('name', '[a-zA-Z0-9]+')->name('companies.show'); //Note: You can use the whereAlpha('name') or the whereAlphaNumeric('name') 
+});
 
-Route::get('/contacts/create', function () {
-    return "<h1>Add New Contacts</h1>";
-})->name('contacts.create');
-
-Route::get('/contacts/{id}', function ($id) {
-    return "Contact " . $id;
-})->where('id', '[0-9]+')->name('contacts.show'); //Note: You can also replace the where constraint above with whereNumber('id') without having to use the regular expression as used above
-
-Route::get('/companies/{name?}', function ($name = null) {
-    if ($name) {
-        return "Company " . $name;
-    } else {
-        return "All companies";
-    }
-})->where('name', '[a-zA-Z0-9]+')->name('companies.show'); //Note: You can use the whereAlpha('name') or the whereAlphaNumeric('name') 
+Route::fallback(function () {
+    return "<h1>Sorry, the requested page cannot be found!</h1>";
+});

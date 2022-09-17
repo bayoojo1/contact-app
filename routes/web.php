@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\Route;
 function getContacts() 
 {
     return [
-        1 => ['name' => 'Ojo Adebayo', 'phone' => '+2348023950246'],
-        2 => ['name' => 'Abiodun Abodunde', 'phone' => '+2348033432378'],
-        3 => ['name' => 'Mfon Umoh', 'phone' => '+2348037047789'],
+        1 => ['name' => 'Adebayo Ojo', 'phone' => '+2348023950246', 'email' => 'bayo.ojo@smilecoms.com'],
+        2 => ['name' => 'Abiodun Abodunde', 'phone' => '+2348033432378', 'email' => 'abiodun.abodunde@smilecoms.com'],
+        3 => ['name' => 'Mfon Umoh', 'phone' => '+2348037047789', 'email' => 'mfon.umoh@smilecoms.com'],
     ];
 }
 
@@ -29,8 +29,15 @@ Route::get('/', function () {
 
 Route::prefix('admin')->group(function () {
     Route::get('/contacts', function () {
+
+        $companies = [
+            1 => ['name' => 'Smile Communications Ltd', 'contacts' => 1],
+            2 => ['name' => 'Smile Communications Ltd', 'contacts' => 2],
+            3 => ['name' => 'Smile Communications Ltd', 'contacts' => 3],
+        ];
+
         $contacts = getContacts();
-    return view('contacts.index', compact('contacts')); //Note: compact function creates an array from variables and their values. Instead of using compact function, we can also pass 'contacts' => $contacts as the second argument of the view.
+    return view('contacts.index', compact('contacts', 'companies')); //Note: compact function creates an array from variables and their values. Instead of using compact function, we can also pass 'contacts' => $contacts as the second argument of the view.
     })->name('contacts.index');
     
     Route::get('/contacts/create', function () {

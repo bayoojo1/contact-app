@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,45 +18,48 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-function getContacts() 
-{
-    return [
-        1 => ['name' => 'Adebayo Ojo', 'phone' => '+2348023950246', 'email' => 'bayo.ojo@smilecoms.com'],
-        2 => ['name' => 'Abiodun Abodunde', 'phone' => '+2348033432378', 'email' => 'abiodun.abodunde@smilecoms.com'],
-        3 => ['name' => 'Mfon Umoh', 'phone' => '+2348037047789', 'email' => 'mfon.umoh@smilecoms.com'],
-    ];
-}
 
-
-Route::get('/', function () {
-   return view('welcome'); 
-});
+Route::get('/', WelcomeController::class);
 
 Route::prefix('admin')->group(function () {
-    Route::get('/contacts', function () {
 
-        $companies = [
-            1 => ['name' => 'Smile Communications Ltd', 'contacts' => 1],
-            2 => ['name' => 'Smile Communications Ltd', 'contacts' => 2],
-            3 => ['name' => 'Smile Communications Ltd', 'contacts' => 3],
-        ];
-
-        $contacts = getContacts();
-    return view('contacts.index', compact('contacts', 'companies')); //Note: compact function creates an array from variables and their values. Instead of using compact function, we can also pass 'contacts' => $contacts as the second argument of the view.
-    })->name('contacts.index');
+    Route::controller(ContactController::class)->group(function () { //This is how you define multiple route that share the same controller
+        Route::get('/contacts', 'index')->name('contacts.index');
     
-    Route::get('/contacts/create', function () {
-        return view('contacts.create');
-    })->name('contacts.create');
-    
-    Route::get('/contacts/{id}', function ($id) {
-        $contacts = getContacts();
+        Route::get('/contacts/create', 'create')->name('contacts.create');
         
-        abort_if(!isset($contacts[$id]), 404); //If you try to access an id that does not exit, this laravel function would redirect to a 404 page
+        Route::get('/contacts/{id}', 'show')->where('id', '[0-9]+')->name('contacts.show'); //Note: You can also replace the where constraint above with whereNumber('id') without having to use the regular expression as used above
+    });
+    // Below is how you define your controller/route/view when you are not grouping multiple routes that uses same controller:
 
-        $contact = $contacts[$id];
-        return view('contacts.show')->with('contact', $contact);
-    })->where('id', '[0-9]+')->name('contacts.show'); //Note: You can also replace the where constraint above with whereNumber('id') without having to use the regular expression as used above
+    // Route::get('/contacts/{id}', [ContactController::class, 'show'])->where('id', '[0-9]+')->name('contacts.show'); //Note: You can also replace the where constraint above with whereNumber('id') without having to use the regular expression as used above
+
+    //We can create controllers that contains all the CRUD resources with the command
+    //=>php artisan make:controller <Controller Name> --resource
+    //OR
+    //=>php artisan make:controller <Controller Name> -r
+    //And below shows the way to create routes to reference those controller resources:
+
+    Route::resource('/companies', CompanyController::class);
+    //We can also register some resources as one, by defining the resources method, and passing an associative array containing our controllers along with the paths
+    Route::resources([
+        '/tags' => TagController::class,
+        '/tasks' => TaskController::class
+    ]);
+    //We can view all the route list by path with the below commands:
+    //=>php artisan route:list --name=tags
+    //=>php artisan route:list --name=tasks
+
+//You can also chain a name function to the controller class like below. In that case, you only need to indicate the view name with the route declaration:
+
+    // Route::controller(ContactController::class)->name('contacts.)->group(function () { 
+    //     Route::get('/contacts', 'index')->name('index');
+    
+    //     Route::get('/contacts/create', 'create')->name('create');
+        
+    //     Route::get('/contacts/{id}', 'show')->where('id', '[0-9]+')->name('show'); 
+    // });
+    
     
     Route::get('/companies/{name?}', function ($name = null) {
         if ($name) {

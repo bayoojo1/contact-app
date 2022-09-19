@@ -54,9 +54,9 @@
                     <div class="col-md-9">
                       <select name="company_id" id="company_id" class="form-control">
                         <option value="">Select Company</option>
-                        <option value="1">Company One</option>
-                        <option value="2">Company Two</option>
-                        <option value="3">Company Three</option>
+                        @foreach($companies as $id => $name) 
+                        <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
                       </select>
                     </div>
                   </div>

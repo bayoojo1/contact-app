@@ -13,7 +13,7 @@ class WelcomeController extends Controller
 }
 
 //When you have a single action in your controller like this, the best approach is to replace your method with a php invoke magic method. In your route declaration, you don't need to pass the method. Just pass the name of your controller
-//You can tell artison to create a single action controller with the below command:
+//You can tell artisan to create a single action controller with the below command:
 // =>php artisan make:controller WelcomeController --invoke
 // OR
 // =>php artisan make:controller WelcomeController -i

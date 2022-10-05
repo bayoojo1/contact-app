@@ -28,7 +28,8 @@ class ContactController extends Controller
         $companies = $this->company->pluck();
 
         //$contacts = $this->getContacts();
-        $contacts = Contact::latest()->get();
+        //$contacts = Contact::latest()->get();
+        $contacts = Contact::latest()->paginate(10);
         
         return view('contacts.index', compact('contacts', 'companies')); //Note: compact function creates an array from variables and their values. Instead of using compact function, we can also pass 'contacts' => $contacts as the second argument of the view.
     }

@@ -27,10 +27,18 @@ Route::prefix('admin')->group(function () {
 
     Route::controller(ContactController::class)->group(function () { //This is how you define multiple route that share the same controller
         Route::get('/contacts', 'index')->name('contacts.index');
+
+        Route::delete('/contacts/{contact}/restore', 'restore')->name('contacts.restore');
+        Route::delete('/contacts/{contact}/force-delete', 'forceDelete')->name('contacts.force-delete');
     
+        Route::post('/contacts', 'store')->name('contacts.store');
+
         Route::get('/contacts/create', 'create')->name('contacts.create');
         
         Route::get('/contacts/{id}', 'show')->where('id', '[0-9]+')->name('contacts.show'); //Note: You can also replace the where constraint above with whereNumber('id') without having to use the regular expression as used above
+        Route::get('/contacts/{id}/edit', 'edit')->where('id', '[0-9]+')->name('contacts.edit'); 
+        Route::put('/contacts/{id}', 'update')->where('id', '[0-9]+')->name('contacts.update'); 
+        Route::delete('/contacts/{id}', 'destroy')->where('id', '[0-9]+')->name('contacts.destroy'); 
     });
 
     //You can also chain a name function to the controller class like below. In that case, you only need to indicate the view name with the route declaration:

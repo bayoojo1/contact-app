@@ -32,24 +32,13 @@ class ContactController extends Controller
         //$contacts = $this->getContacts();
         //$contacts = Contact::latest()->get();
         //DB::enableQueryLog();
-        $query = Contact::query();
-        if(request()->query('trash')) {
-            $query->onlyTrashed();
-        }
-        $contacts = $query->latest()->where(function ($query) {
-            if($companyId = request()->query("company_id")) {
-                $query->where("company_id", $companyId);
-            }
-        })->where(function ($query) {
-            if($search = request()->query('search')) {
-                $query->where("first_name", "LIKE", "%{$search}%");
-                $query->orWhere("last_name", "LIKE", "%{$search}%");
-                $query->orWhere("email", "LIKE", "%{$search}%");
-                $query->orWhere("phone", "LIKE", "%{$search}%");
-                $query->orWhere("company_id", "LIKE", "%{$search}%");
-                $query->orWhere("address", "LIKE", "%{$search}%");
-            }
-        })->paginate(10);
+        // $query = Contact::query();
+        
+        $contacts = Contact::allowTrash()
+        ->allowSorts('first_name')
+        ->allowFilters('company_id')
+        ->allowSearch('first_name', 'last_name', 'email', 'phone', 'company_id', 'address')
+        ->paginate(10);
         //dump(DB::getQueryLog());
         return view('contacts.index', compact('contacts', 'companies')); //Note: compact function creates an array from variables and their values. Instead of using compact function, we can also pass 'contacts' => $contacts as the second argument of the view.
     }
